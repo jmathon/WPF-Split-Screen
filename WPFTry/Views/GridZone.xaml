@@ -1,0 +1,31 @@
+﻿<UserControl x:Class="WPFTry.Views.GridZone"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPFTry"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <local:BooleanToColor x:Key="BooleanToColor" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <DockPanel x:Name="Pan1" DataContext="{Binding Pan1}" Grid.Row="0" Grid.Column="0" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
+        <!--Background="#FFFFAE00-->
+        <DockPanel x:Name="Pan2" DataContext="{Binding Pan2}" Grid.Row="0" Grid.Column="1" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
+        <DockPanel x:Name="Pan3" DataContext="{Binding Pan3}" Grid.Row="1" Grid.Column="0" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
+        <DockPanel x:Name="Pan4" DataContext="{Binding Pan4}" Grid.Row="1" Grid.Column="1" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
+
+        <Button Content="Switch zone" Grid.Column="1" HorizontalAlignment="Left" Margin="10,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" Click="Button_Click"/>
+        <Button Content="Enter" Grid.Column="1" HorizontalAlignment="Left" Margin="90,10,0,0" Grid.Row="1" VerticalAlignment="Top" Width="75" RenderTransformOrigin="-0.653,-0.773" Click="Button_Click_1"/>
+    </Grid>
+</UserControl>
