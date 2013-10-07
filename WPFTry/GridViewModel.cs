@@ -27,12 +27,13 @@ namespace WPFTry
         }
     }
 
-    public class GridViewModel : PanAbstract
+    public class GridViewModel
     {
+        IList<PanelViewModel> _panels = new List<PanelViewModel>();
+        PanelViewModel _current = null;
+
         public GridViewModel()
         {
-            Pan1.IsActive = true;
-            Pan1.Pan1.IsActive = true;
         }
     }
 
