@@ -60,6 +60,8 @@
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ViewModels\GridViewModel.cs" />
+    <Compile Include="ViewModels\PanelViewModel.cs" />
     <Compile Include="Views\GridZone.xaml.cs">
       <DependentUpon>GridZone.xaml</DependentUpon>
     </Compile>
@@ -68,7 +70,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BooleanToVisibilityConverter.cs" />
-    <Compile Include="GridViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

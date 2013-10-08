@@ -11,6 +11,6 @@
             <RowDefinition Height="30"/>
         </Grid.RowDefinitions>
         <Button Content="Switch" Grid.Row="1" Width="75" VerticalAlignment="Center" HorizontalAlignment="Right" Command="{Binding Switch}" CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
-        <Button Content="Enter" HorizontalAlignment="Right" Margin="0,0,85,0"  Grid.Row="1" VerticalAlignment="Center" Width="75"/>
+        <Button Content="Enter" HorizontalAlignment="Right" Margin="0,0,85,0"  Grid.Row="1" VerticalAlignment="Center" Width="75" Command="{Binding Enter}" CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
     </Grid>
 </Window>

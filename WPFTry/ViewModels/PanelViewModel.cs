@@ -1,18 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Input;
 using WPFTry.Views;
 
-namespace WPFTry
+namespace WPFTry.ViewModels
 {
     public class PanelViewModel : INotifyPropertyChanged
     {
+        public event EventHandler<EnterNowEventArgs> EnterNow;
+
+        private void OnEnterNow( EnterNowEventArgs e )
+        {
+            if( EnterNow != null ) EnterNow( this, e );
+        }
+
         GridZone _visualElement = null;
         public GridZone VisualElement
         {
@@ -105,18 +109,10 @@ namespace WPFTry
             n.IsActive = true;
         }
 
-        public PanelViewModel Enter( DockPanel dock )
-        {
-            return EnterInternal( dock );
-        }
-
-        PanelViewModel EnterInternal( DockPanel dock )
+        public PanelViewModel Enter()
         {
             var newPanel = new PanelViewModel();
-
-            if( dock == null ) throw new ArgumentNullException( "dock" );
-            if( dock.Children.Count == 0 ) dock.Children.Add( newPanel.VisualElement );
-
+            OnEnterNow( new EnterNowEventArgs( newPanel ) );
             return newPanel;
         }
 
@@ -145,68 +141,21 @@ namespace WPFTry
         }
     }
 
-    public class Switcher : ICommand
+    public class EnterNowEventArgs : EventArgs
     {
-        #region ICommand Members
+        readonly PanelViewModel _panel;
 
-        public bool CanExecute( object parameter )
+        public EnterNowEventArgs( PanelViewModel panel )
         {
-            return true;
+            _panel = panel;
         }
 
-        public event EventHandler CanExecuteChanged;
-
-        public void Execute( object gridView )
-        {
-            GridViewModel g = (GridViewModel)gridView;
-            g.SwitchCommand();
-        }
-
-        #endregion
-    }
-
-    public class GridViewModel
-    {
-        IList<PanelViewModel> _panels = new List<PanelViewModel>();
-        PanelViewModel _current = null;
-
-        public PanelViewModel Current
+        public PanelViewModel Panel
         {
             get
             {
-                return _current;
+                return _panel;
             }
-        }
-
-        public GridViewModel()
-        {
-            var m = new PanelViewModel();
-            _panels.Add( m );
-            _current = m;
-            m.Pan1.IsActive = true;
-            m.Pan2.IsActive = false;
-            m.Pan3.IsActive = false;
-            m.Pan4.IsActive = false;
-
-            Switch = new Switcher();
-        }
-
-        public ICommand Switch { get; private set; }
-
-        public void SwitchCommand()
-        {
-            Debug.Assert( _current != null );
-            _current.Switch();
-        }
-
-        void EnterCommand( DockPanel dock )
-        {
-            Debug.Assert( _current != null );
-            Debug.Assert( _panels.Count > 0 );
-
-            var newPanel = _current.Enter( dock );
-            _panels.Add( newPanel );
-            _current = newPanel;
         }
     }
 }
