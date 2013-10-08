@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace WPFTry.ViewModels
@@ -50,6 +51,8 @@ namespace WPFTry.ViewModels
 
     public class GridViewModel
     {
+        private const int MaxDeep = 4;
+
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
         PanelViewModel _current = null;
 
@@ -90,9 +93,16 @@ namespace WPFTry.ViewModels
             Debug.Assert( _current != null );
             Debug.Assert( _panels.Count > 0 );
 
-            var newPanel = _current.Enter();
-            _panels.Add( newPanel );
-            _current = newPanel;
+            if( (_panels.Count - 1) < MaxDeep )
+            {
+                var newPanel = _current.Enter();
+                _panels.Add( newPanel );
+                _current = newPanel;
+            }
+            else
+            {
+                MessageBox.Show( "You have reached the max deep !" );
+            }
         }
     }
 }
