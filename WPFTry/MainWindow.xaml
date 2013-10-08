@@ -5,8 +5,6 @@
         xmlns:views="clr-namespace:WPFTry.Views"
         Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" WindowState="Maximized" Opacity="0.5" WindowStyle="None" Background="#FFFBFBFB" AllowsTransparency="True"
         x:Name="MWin" Topmost="True">
-    <Window.DataContext>
-        <local:GridViewModel/>
-    </Window.DataContext>
-    <views:GridZone DataContext="{Binding DataContext, ElementName=MWin}" />
+    <DockPanel HorizontalAlignment="Left" Height="350" LastChildFill="False" VerticalAlignment="Top" Width="525">
+    </DockPanel>
 </Window>

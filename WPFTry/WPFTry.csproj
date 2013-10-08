@@ -53,6 +53,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Assert.cs" />
     <Compile Include="BooleanToColor.cs" />
     <Compile Include="Views\GridZone.xaml.cs">
       <DependentUpon>GridZone.xaml</DependentUpon>

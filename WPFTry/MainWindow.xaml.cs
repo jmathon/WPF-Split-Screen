@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFTry.Views;
 
 namespace WPFTry
 {
@@ -20,9 +21,12 @@ namespace WPFTry
     /// </summary>
     public partial class MainWindow : Window
     {
+        GridViewModel _grid = new GridViewModel();
+
         public MainWindow()
         {
             InitializeComponent();
+            MWin.Content = _grid.Current.VisualElement;
         }
     }
 }

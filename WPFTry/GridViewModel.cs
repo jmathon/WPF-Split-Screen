@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,41 +10,39 @@ using WPFTry.Views;
 
 namespace WPFTry
 {
-    public class PanelViewModel : PanAbstract
+    public class PanelViewModel : INotifyPropertyChanged
     {
-        bool _isActive = false;
-        public bool IsActive
+        GridZone _visualElement = null;
+        public GridZone VisualElement
         {
             get
             {
-                return _isActive;
-            }
-
-            set
-            {
-                _isActive = value;
-                OnPropertyChanged( "IsActive" );
+                if( _visualElement == null ) _visualElement = new GridZone( this );
+                return _visualElement;
             }
         }
-    }
 
-    public class GridViewModel
-    {
-        IList<PanelViewModel> _panels = new List<PanelViewModel>();
-        PanelViewModel _current = null;
-
-        public GridViewModel()
-        {
-        }
-    }
-
-    public abstract class PanAbstract : INotifyPropertyChanged
-    {
         #region INotifyPropertyChanged Members
 
         public virtual event PropertyChangedEventHandler PropertyChanged;
 
         #endregion
+
+        public PanelViewModel Current
+        {
+            get
+            {
+                return Pan1.IsActive ? Pan1 : Pan2.IsActive ? Pan2 : Pan3.IsActive ? Pan3 : Pan4.IsActive ? Pan4 : Pan1;
+            }
+        }
+
+        public PanelViewModel Next
+        {
+            get
+            {
+                return Pan1.IsActive ? Pan2 : Pan2.IsActive ? Pan3 : Pan3.IsActive ? Pan4 : Pan4.IsActive ? Pan1 : Pan1;
+            }
+        }
 
         PanelViewModel _pan1 = null;
         public PanelViewModel Pan1
@@ -93,27 +92,35 @@ namespace WPFTry
             if( _pan4 == null ) _pan4 = new PanelViewModel();
         }
 
-        public void SetActive( PanelViewModel panel )
+        public void Switch()
         {
-            if( panel == null ) throw new ArgumentNullException( "panel" );
-            panel.IsActive = true;
+            SetNextActive();
+        }
 
-            if( panel != Pan1 ) Pan1.IsActive = false;
-            if( panel != Pan2 ) Pan2.IsActive = false;
-            if( panel != Pan3 ) Pan3.IsActive = false;
-            if( panel != Pan4 ) Pan4.IsActive = false;
+        void SetNextActive()
+        {
+            Next.IsActive = true;
+
+            if( Next != Pan1 ) Pan1.IsActive = false;
+            if( Next != Pan2 ) Pan2.IsActive = false;
+            if( Next != Pan3 ) Pan3.IsActive = false;
+            if( Next != Pan4 ) Pan4.IsActive = false;
 
         }
 
-        public void Enter( PanAbstract currentPanel, DockPanel dock )
+        public PanelViewModel Enter( DockPanel dock )
         {
-            if( dock == null ) throw new ArgumentNullException( "dock" );
-            if( dock.Children.Count == 0 ) dock.Children.Add( new GridZone() );
+            return EnterInternal( dock );
+        }
 
-            currentPanel.Pan1.IsActive = true;
-            currentPanel.Pan2.IsActive = false;
-            currentPanel.Pan3.IsActive = false;
-            currentPanel.Pan4.IsActive = false;
+        PanelViewModel EnterInternal( DockPanel dock )
+        {
+            var newPanel = new PanelViewModel();
+
+            if( dock == null ) throw new ArgumentNullException( "dock" );
+            if( dock.Children.Count == 0 ) dock.Children.Add( newPanel.VisualElement );
+
+            return newPanel;
         }
 
         protected virtual void OnPropertyChanged( string name )
@@ -123,6 +130,62 @@ namespace WPFTry
             {
                 handler( this, new PropertyChangedEventArgs( name ) );
             }
+        }
+
+        bool _isActive = false;
+        public bool IsActive
+        {
+            get
+            {
+                return _isActive;
+            }
+
+            set
+            {
+                _isActive = value;
+                OnPropertyChanged( "IsActive" );
+            }
+        }
+    }
+
+    public class GridViewModel
+    {
+        IList<PanelViewModel> _panels = new List<PanelViewModel>();
+        PanelViewModel _current = null;
+
+        public PanelViewModel Current
+        {
+            get
+            {
+                return _current;
+            }
+        }
+
+        public GridViewModel()
+        {
+            var m = new PanelViewModel();
+            _panels.Add( m );
+            _current = m;
+            m.Pan1.IsActive = true;
+            m.Pan2.IsActive = true;
+            m.Pan3.IsActive = true;
+            m.Pan4.IsActive = true;
+        }
+
+        void Switch()
+        {
+            Debug.Assert( _current != null );
+            _current.Switch();
+        }
+
+        void Enter( DockPanel dock )
+        {
+            Debug.Assert( _current != null );
+            Debug.Assert( _panels.Count > 0 );
+
+            var newPanel = _current.Enter( dock );
+            _panels.Add( newPanel );
+            _current = newPanel;
         }
     }
 }
