@@ -22,7 +22,7 @@
         <DockPanel x:Name="Pan1" DataContext="{Binding Pan1}" Grid.Row="0" Grid.Column="0" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
         <!--Background="#FFFFAE00-->
         <DockPanel x:Name="Pan2" DataContext="{Binding Pan2}" Grid.Row="0" Grid.Column="1" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
-        <DockPanel x:Name="Pan3" DataContext="{Binding Pan3}" Grid.Row="1" Grid.Column="0" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
-        <DockPanel x:Name="Pan4" DataContext="{Binding Pan4}" Grid.Row="1" Grid.Column="1" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
+        <DockPanel x:Name="Pan4" DataContext="{Binding Pan3}" Grid.Row="1" Grid.Column="0" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
+        <DockPanel x:Name="Pan3" DataContext="{Binding Pan4}" Grid.Row="1" Grid.Column="1" Background="{Binding IsActive, Converter={StaticResource BooleanToColor}}"/>
     </Grid>
 </UserControl>

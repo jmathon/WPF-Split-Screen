@@ -167,9 +167,9 @@ namespace WPFTry
             _panels.Add( m );
             _current = m;
             m.Pan1.IsActive = true;
-            m.Pan2.IsActive = true;
-            m.Pan3.IsActive = true;
-            m.Pan4.IsActive = true;
+            m.Pan2.IsActive = false;
+            m.Pan3.IsActive = false;
+            m.Pan4.IsActive = false;
         }
 
         void Switch()
