@@ -21,12 +21,9 @@ namespace WPFTry
     /// </summary>
     public partial class MainWindow : Window
     {
-        GridViewModel _grid = new GridViewModel();
-
         public MainWindow()
         {
             InitializeComponent();
-            MWin.Content = _grid.Current.VisualElement;
         }
     }
 }

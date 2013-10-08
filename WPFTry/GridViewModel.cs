@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Input;
 using WPFTry.Views;
 
 namespace WPFTry
@@ -94,18 +95,14 @@ namespace WPFTry
 
         public void Switch()
         {
-            SetNextActive();
-        }
+            var n = Next;
 
-        void SetNextActive()
-        {
-            Next.IsActive = true;
+            if( n != Pan1 ) Pan1.IsActive = false;
+            if( n != Pan2 ) Pan2.IsActive = false;
+            if( n != Pan3 ) Pan3.IsActive = false;
+            if( n != Pan4 ) Pan4.IsActive = false;
 
-            if( Next != Pan1 ) Pan1.IsActive = false;
-            if( Next != Pan2 ) Pan2.IsActive = false;
-            if( Next != Pan3 ) Pan3.IsActive = false;
-            if( Next != Pan4 ) Pan4.IsActive = false;
-
+            n.IsActive = true;
         }
 
         public PanelViewModel Enter( DockPanel dock )
@@ -148,6 +145,26 @@ namespace WPFTry
         }
     }
 
+    public class Switcher : ICommand
+    {
+        #region ICommand Members
+
+        public bool CanExecute( object parameter )
+        {
+            return true;
+        }
+
+        public event EventHandler CanExecuteChanged;
+
+        public void Execute( object gridView )
+        {
+            GridViewModel g = (GridViewModel)gridView;
+            g.SwitchCommand();
+        }
+
+        #endregion
+    }
+
     public class GridViewModel
     {
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
@@ -170,15 +187,19 @@ namespace WPFTry
             m.Pan2.IsActive = false;
             m.Pan3.IsActive = false;
             m.Pan4.IsActive = false;
+
+            Switch = new Switcher();
         }
 
-        void Switch()
+        public ICommand Switch { get; private set; }
+
+        public void SwitchCommand()
         {
             Debug.Assert( _current != null );
             _current.Switch();
         }
 
-        void Enter( DockPanel dock )
+        void EnterCommand( DockPanel dock )
         {
             Debug.Assert( _current != null );
             Debug.Assert( _panels.Count > 0 );
