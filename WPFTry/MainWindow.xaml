@@ -5,8 +5,11 @@
         xmlns:views="clr-namespace:WPFTry.Views"
         Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" WindowState="Maximized" Opacity="0.5" WindowStyle="None" Background="#FFFBFBFB" AllowsTransparency="True"
         x:Name="MWin" Topmost="True">
-    <Window.DataContext>
-        <local:GridViewModel/>
-    </Window.DataContext>
-    <views:GridZone DataContext="{Binding DataContext, ElementName=MWin}" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Button Content="Enter" HorizontalAlignment="Right" Margin="0,0,2,0"  Grid.Row="1" VerticalAlignment="Center" Width="75" Command="{Binding Enter}" CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
+    </Grid>
 </Window>

@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFTry.Events;
+using WPFTry.ViewModels;
 
 namespace WPFTry.Views
 {
@@ -20,25 +22,80 @@ namespace WPFTry.Views
     /// </summary>
     public partial class GridZone : UserControl
     {
-        public GridZone()
+        readonly PanelViewModel _panel;
+        IList<DockPanel> _dockPanels = new List<DockPanel>();
+
+        public GridZone( PanelViewModel panel )
         {
+            _panel = panel;
+            DataContext = panel;
             InitializeComponent();
+
+            panel.EnterNow += OnEnterNow;
+
+            _panel.CreatePanels();
+            CreateDefinitions();
+            CreatePanels();
         }
 
-        private void Button_Click( object sender, RoutedEventArgs e )
+        void CreateDefinitions()
         {
-            PanAbstract viewModel = (PanAbstract)base.DataContext;
+            for( int i = 0; i < _panel.MaxColumnByRowProperty; i++ )
+            {
+                SplitGrid.ColumnDefinitions.Add( new ColumnDefinition() );
+            }
 
-            var panToShow = viewModel.Pan1.IsActive ? viewModel.Pan2 : viewModel.Pan2.IsActive ? viewModel.Pan3 : viewModel.Pan3.IsActive ? viewModel.Pan4 : viewModel.Pan4.IsActive ? viewModel.Pan1 : viewModel.Pan1;
-            viewModel.SetActive( panToShow );
+            for( int i = 0; i < _panel.MaxRowProperty; i++ )
+            {
+                SplitGrid.RowDefinitions.Add( new RowDefinition() );
+            }
         }
 
-        private void Button_Click_1( object sender, RoutedEventArgs e )
+        void CreatePanels()
         {
-            PanAbstract viewModel = (PanAbstract)base.DataContext;
-            var panToModify = viewModel.Pan1.IsActive ? Pan1 : viewModel.Pan2.IsActive ? Pan2 : viewModel.Pan3.IsActive ? Pan3 : viewModel.Pan4.IsActive ? Pan4 : Pan1;
-            var currentPan = viewModel.Pan1.IsActive ? viewModel.Pan1 : viewModel.Pan2.IsActive ? viewModel.Pan2 : viewModel.Pan3.IsActive ? viewModel.Pan3 : viewModel.Pan4.IsActive ? viewModel.Pan4 : viewModel.Pan1;
-            viewModel.Enter( currentPan, panToModify );
+            int nbPanels = _panel.MaxColumnByRowProperty * _panel.MaxRowProperty;
+
+            int column = 0;
+            int row = 0;
+            bool rightDirection = true;
+            for( int i = 0; i < nbPanels; i++ )
+            {
+                DockPanel dp = new DockPanel();
+                dp.DataContext = _panel.Panels[i];
+                dp.SetBinding( DockPanel.BackgroundProperty, new Binding( "IsActive" ) { Converter = new BooleanToColor() } );
+
+                Grid.SetColumn( dp, column );
+                Grid.SetRow( dp, row );
+                SplitGrid.Children.Add( dp );
+
+                if( rightDirection ) column++;
+                else column--;
+
+                if( column >= _panel.MaxColumnByRowProperty && rightDirection )
+                {
+                    row++;
+                    column--;
+                    rightDirection = false;
+                }
+                else if( column == -1 && !rightDirection )
+                {
+                    row++;
+                    rightDirection = true;
+                    column++;
+                }
+                _dockPanels.Add( dp );
+            }
+        }
+
+        private void OnEnterNow( object sender, EnterNowEventArgs e )
+        {
+            PanelViewModel p = (PanelViewModel)sender;
+            DockPanel dp = _dockPanels[e.CurrentPosition];
+
+            if( dp != null )
+            {
+                dp.Children.Add( new GridZone( e.Panel ) );
+            }
         }
     }
 }
