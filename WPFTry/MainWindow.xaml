@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:WPFTry"
         xmlns:views="clr-namespace:WPFTry.Views"
-        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" WindowState="Maximized" Opacity="0.5" WindowStyle="None" Background="#FFFBFBFB" AllowsTransparency="True"
+        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" Opacity="0.5" WindowStyle="None" Background="#FFFBFBFB" AllowsTransparency="True"
         x:Name="MWin" Topmost="True">
     <Grid>
         <Grid.RowDefinitions>
