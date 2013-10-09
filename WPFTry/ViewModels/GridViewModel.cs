@@ -9,26 +9,6 @@ using System.Windows.Input;
 
 namespace WPFTry.ViewModels
 {
-    public class SwitchCommand : ICommand
-    {
-        #region ICommand Members
-
-        public bool CanExecute( object parameter )
-        {
-            return true;
-        }
-
-        public event EventHandler CanExecuteChanged;
-
-        public void Execute( object gridView )
-        {
-            GridViewModel g = (GridViewModel)gridView;
-            g.SwitchCommand();
-        }
-
-        #endregion
-    }
-
     public class EnterCommand : ICommand
     {
         #region ICommand Members
@@ -74,11 +54,8 @@ namespace WPFTry.ViewModels
             m.Pan3.IsActive = false;
             m.Pan4.IsActive = false;
 
-            Switch = new SwitchCommand();
             Enter = new EnterCommand();
         }
-
-        public ICommand Switch { get; private set; }
 
         public ICommand Enter { get; set; }
 
