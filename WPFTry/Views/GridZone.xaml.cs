@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFTry.Events;
 using WPFTry.ViewModels;
 
 namespace WPFTry.Views
@@ -21,28 +22,79 @@ namespace WPFTry.Views
     /// </summary>
     public partial class GridZone : UserControl
     {
+        readonly PanelViewModel _panel;
+        IList<DockPanel> _dockPanels = new List<DockPanel>();
+
         public GridZone( PanelViewModel panel )
         {
+            _panel = panel;
             DataContext = panel;
             InitializeComponent();
 
             panel.EnterNow += OnEnterNow;
+
+            _panel.CreatePanels();
+            CreateDefinitions();
+            CreatePanels();
+        }
+
+        void CreateDefinitions()
+        {
+            for( int i = 0; i < _panel.MaxColumnByRowProperty; i++ )
+            {
+                SplitGrid.ColumnDefinitions.Add( new ColumnDefinition() );
+            }
+
+            for( int i = 0; i < _panel.MaxRowProperty; i++ )
+            {
+                SplitGrid.RowDefinitions.Add( new RowDefinition() );
+            }
+        }
+
+        void CreatePanels()
+        {
+            int nbPanels = _panel.MaxColumnByRowProperty * _panel.MaxRowProperty;
+
+            int column = 0;
+            int row = 0;
+            bool rightDirection = true;
+            for( int i = 0; i < nbPanels; i++ )
+            {
+                DockPanel dp = new DockPanel();
+                dp.DataContext = _panel.Panels[i];
+                dp.SetBinding( DockPanel.BackgroundProperty, new Binding( "IsActive" ) { Converter = new BooleanToColor() } );
+
+                Grid.SetColumn( dp, column );
+                Grid.SetRow( dp, row );
+                SplitGrid.Children.Add( dp );
+
+                if( rightDirection ) column++;
+                else column--;
+
+                if( column >= _panel.MaxColumnByRowProperty && rightDirection )
+                {
+                    row++;
+                    column--;
+                    rightDirection = false;
+                }
+                else if( column == -1 && !rightDirection )
+                {
+                    row++;
+                    rightDirection = true;
+                    column++;
+                }
+                _dockPanels.Add( dp );
+            }
         }
 
         private void OnEnterNow( object sender, EnterNowEventArgs e )
         {
             PanelViewModel p = (PanelViewModel)sender;
-            DockPanel dp = null;
-
-            if( p.Pan1.IsActive ) dp = p.VisualElement.Pan1;
-            if( p.Pan2.IsActive ) dp = p.VisualElement.Pan2;
-            if( p.Pan3.IsActive ) dp = p.VisualElement.Pan3;
-            if( p.Pan4.IsActive ) dp = p.VisualElement.Pan4;
+            DockPanel dp = _dockPanels[e.CurrentPosition];
 
             if( dp != null )
             {
-                e.Panel.Pan1.IsActive = true;
-                dp.Children.Add( e.Panel.VisualElement );
+                dp.Children.Add( new GridZone( e.Panel ) );
             }
         }
     }

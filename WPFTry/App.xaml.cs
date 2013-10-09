@@ -24,7 +24,7 @@ namespace WPFTry
             InitializeComponent();
             Window w = new MainWindow();
             w.DataContext = _grid;
-            GridZone g = _grid.Current.VisualElement;
+            GridZone g = new GridZone( _grid.Current );
             Grid.SetColumn( g, 0 );
             Grid.SetRow( g, 0 );
             Grid myGrid = (Grid)w.Content;
@@ -41,7 +41,7 @@ namespace WPFTry
             {
                 _grid.SwitchCommand();
             };
-            timer.Interval = new TimeSpan( 0, 0, 2 );
+            timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
             timer.Start();
         }
 

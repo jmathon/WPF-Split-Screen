@@ -1,15 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WPFTry.Events;
 using WPFTry.Views;
 
 namespace WPFTry.ViewModels
 {
     public class PanelViewModel : INotifyPropertyChanged
     {
+        public int MaxColumnByRowProperty { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxColumnByRow"] ); } }
+
+        public int MaxRowProperty { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxRow"] ); } }
+
+        IList<PanelViewModel> _panels = new List<PanelViewModel>();
+
+        public void CreatePanels()
+        {
+            int nbPanels = MaxColumnByRowProperty * MaxRowProperty;
+            for( int i = 0; i < nbPanels; i++ )
+            {
+                PanelViewModel p = new PanelViewModel();
+                if( i == 0 ) p.IsActive = true;
+                _panels.Add( p );
+            }
+        }
+
         public event EventHandler<EnterNowEventArgs> EnterNow;
 
         private void OnEnterNow( EnterNowEventArgs e )
@@ -17,104 +36,9 @@ namespace WPFTry.ViewModels
             if( EnterNow != null ) EnterNow( this, e );
         }
 
-        GridZone _visualElement = null;
-        public GridZone VisualElement
-        {
-            get
-            {
-                if( _visualElement == null ) _visualElement = new GridZone( this );
-                return _visualElement;
-            }
-        }
-
         #region INotifyPropertyChanged Members
 
         public virtual event PropertyChangedEventHandler PropertyChanged;
-
-        #endregion
-
-        public PanelViewModel Current
-        {
-            get
-            {
-                return Pan1.IsActive ? Pan1 : Pan2.IsActive ? Pan2 : Pan3.IsActive ? Pan3 : Pan4.IsActive ? Pan4 : Pan1;
-            }
-        }
-
-        public PanelViewModel Next
-        {
-            get
-            {
-                return Pan1.IsActive ? Pan2 : Pan2.IsActive ? Pan3 : Pan3.IsActive ? Pan4 : Pan4.IsActive ? Pan1 : Pan1;
-            }
-        }
-
-        PanelViewModel _pan1 = null;
-        public PanelViewModel Pan1
-        {
-            get
-            {
-                SetPanels();
-                return _pan1;
-            }
-        }
-
-        PanelViewModel _pan2 = null;
-        public PanelViewModel Pan2
-        {
-            get
-            {
-                SetPanels();
-                return _pan2;
-            }
-        }
-
-        PanelViewModel _pan3 = null;
-        public PanelViewModel Pan3
-        {
-            get
-            {
-                SetPanels();
-                return _pan3;
-            }
-        }
-
-        PanelViewModel _pan4 = null;
-        public PanelViewModel Pan4
-        {
-            get
-            {
-                SetPanels();
-                return _pan4;
-            }
-        }
-
-        void SetPanels()
-        {
-            if( _pan1 == null ) _pan1 = new PanelViewModel();
-            if( _pan2 == null ) _pan2 = new PanelViewModel();
-            if( _pan3 == null ) _pan3 = new PanelViewModel();
-            if( _pan4 == null ) _pan4 = new PanelViewModel();
-        }
-
-        public void Switch()
-        {
-            var n = Next;
-
-            if( n != Pan1 ) Pan1.IsActive = false;
-            if( n != Pan2 ) Pan2.IsActive = false;
-            if( n != Pan3 ) Pan3.IsActive = false;
-            if( n != Pan4 ) Pan4.IsActive = false;
-
-            n.IsActive = true;
-        }
-
-        public PanelViewModel Enter()
-        {
-            var newPanel = new PanelViewModel();
-            OnEnterNow( new EnterNowEventArgs( newPanel ) );
-            return newPanel;
-        }
 
         protected virtual void OnPropertyChanged( string name )
         {
@@ -123,6 +47,49 @@ namespace WPFTry.ViewModels
             {
                 handler( this, new PropertyChangedEventArgs( name ) );
             }
+        }
+
+        #endregion
+
+        public PanelViewModel Current
+        {
+            get
+            {
+                return _panels.Where( a => a.IsActive ).SingleOrDefault() ?? _panels[0];
+            }
+        }
+
+        public PanelViewModel Next
+        {
+            get
+            {
+                int currentIndex = _panels.IndexOf( Current );
+                int nextIndex = (currentIndex + 1) < _panels.Count ? currentIndex + 1 : 0;
+                return _panels[nextIndex];
+            }
+        }
+
+        public IList<PanelViewModel> Panels
+        {
+            get
+            {
+                return _panels;
+            }
+        }
+
+        public void Switch()
+        {
+            var n = Next;
+
+            Current.IsActive = false;
+            n.IsActive = true;
+        }
+
+        public PanelViewModel Enter()
+        {
+            var newPanel = new PanelViewModel();
+            OnEnterNow( new EnterNowEventArgs( newPanel, _panels.IndexOf( Current ) ) );
+            return newPanel;
         }
 
         bool _isActive = false;
@@ -137,24 +104,6 @@ namespace WPFTry.ViewModels
             {
                 _isActive = value;
                 OnPropertyChanged( "IsActive" );
-            }
-        }
-    }
-
-    public class EnterNowEventArgs : EventArgs
-    {
-        readonly PanelViewModel _panel;
-
-        public EnterNowEventArgs( PanelViewModel panel )
-        {
-            _panel = panel;
-        }
-
-        public PanelViewModel Panel
-        {
-            get
-            {
-                return _panel;
             }
         }
     }

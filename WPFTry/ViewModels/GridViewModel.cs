@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -31,7 +32,7 @@ namespace WPFTry.ViewModels
 
     public class GridViewModel
     {
-        private const int MaxDeep = 4;
+        public int MaxDeep { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxDeep"] ); } }
 
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
         PanelViewModel _current = null;
@@ -49,10 +50,6 @@ namespace WPFTry.ViewModels
             var m = new PanelViewModel();
             _panels.Add( m );
             _current = m;
-            m.Pan1.IsActive = true;
-            m.Pan2.IsActive = false;
-            m.Pan3.IsActive = false;
-            m.Pan4.IsActive = false;
 
             Enter = new EnterCommand();
         }
@@ -78,7 +75,7 @@ namespace WPFTry.ViewModels
             }
             else
             {
-                MessageBox.Show( "You have reached the max deep !" );
+                MessageBox.Show( "You have reached the max deep !", "Warning...", MessageBoxButton.OK, MessageBoxImage.Exclamation );
             }
         }
     }
