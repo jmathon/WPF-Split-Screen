@@ -95,7 +95,14 @@ namespace WPFTry.Views
             if( dp != null )
             {
                 dp.Children.Add( new GridZone( e.Panel ) );
+                e.Panel.ExitNode += OnExit;
             }
+        }
+
+        private void OnExit( int position )
+        {
+            DockPanel dp = _dockPanels[position];
+            dp.Children.Clear();
         }
     }
 }

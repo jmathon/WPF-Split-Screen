@@ -106,5 +106,14 @@ namespace WPFTry.ViewModels
                 OnPropertyChanged( "IsActive" );
             }
         }
+
+        public delegate void ExitHandler( int position );
+
+        public event ExitHandler ExitNode;
+
+        public void Exit( int position )
+        {
+            ExitNode( position );
+        }
     }
 }

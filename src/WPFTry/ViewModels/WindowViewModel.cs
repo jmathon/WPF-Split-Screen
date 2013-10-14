@@ -18,6 +18,11 @@ namespace WPFTry.ViewModels
         {
             IsActive = false;
             GridOwned = new GridViewModel();
+            GridOwned.ExitNode += Exit;
+        }
+
+        void Exit( PanelViewModel sender )
+        {
         }
 
         public bool IsActive { get; set; }

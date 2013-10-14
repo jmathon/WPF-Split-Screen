@@ -37,7 +37,7 @@ namespace WPFTry.ViewModels
             Debug.Assert( Current != null );
             _timer.Tick += delegate( object s, EventArgs args )
             {
-		Current.Switch();
+                Current.Switch();
             };
             _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
             _timer.Start();
@@ -63,12 +63,16 @@ namespace WPFTry.ViewModels
             }
         }
 
+        public delegate void ExitNodeHandler( PanelViewModel p );
+        public event ExitNodeHandler ExitNode;
+
         public void ExitCommand()
         {
             Debug.Assert( Current != null );
             Debug.Assert( _panels.Count > 0 );
 
             var panelToRemove = _panels.Pop();
+            panelToRemove.Exit( _panels.Count );
         }
     }
 }
