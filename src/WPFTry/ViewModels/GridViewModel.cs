@@ -7,33 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace WPFTry.ViewModels
 {
-    public class EnterCommand : ICommand
-    {
-        #region ICommand Members
-
-        public bool CanExecute( object parameter )
-        {
-            return true;
-        }
-
-        public event EventHandler CanExecuteChanged;
-
-        public void Execute( object gridView )
-        {
-            GridViewModel g = (GridViewModel)gridView;
-            g.EnterCommand();
-        }
-
-        #endregion
-    }
-
     public class GridViewModel
     {
-        public int MaxDeep { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxDeep"] ); } }
-
+        readonly DispatcherTimer _timer = new DispatcherTimer();
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
         PanelViewModel _current = null;
 
@@ -45,21 +25,25 @@ namespace WPFTry.ViewModels
             }
         }
 
+        public int MaxDeep { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxDeep"] ); } }
+
         public GridViewModel()
         {
             var m = new PanelViewModel();
             _panels.Add( m );
             _current = m;
-
-            Enter = new EnterCommand();
         }
-
-        public ICommand Enter { get; set; }
 
         public void SwitchCommand()
         {
             Debug.Assert( _current != null );
-            _current.Switch();
+            _timer.Tick += delegate( object s, EventArgs args )
+            {
+                _current.Switch();
+            };
+            _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
+            _timer.Start();
+
         }
 
         public void EnterCommand()
@@ -69,12 +53,15 @@ namespace WPFTry.ViewModels
 
             if( (_panels.Count - 1) < MaxDeep )
             {
+                _timer.Stop();
                 var newPanel = _current.Enter();
                 _panels.Add( newPanel );
                 _current = newPanel;
+                _timer.Start();
             }
             else
             {
+                _timer.Stop();
                 MessageBox.Show( "You have reached the max deep !", "Warning...", MessageBoxButton.OK, MessageBoxImage.Exclamation );
             }
         }
