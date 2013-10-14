@@ -66,6 +66,7 @@
     </Compile>
     <Compile Include="ViewModels\GridViewModel.cs" />
     <Compile Include="ViewModels\PanelViewModel.cs" />
+    <Compile Include="ViewModels\WindowViewModel.cs" />
     <Compile Include="Views\GridZone.xaml.cs">
       <DependentUpon>GridZone.xaml</DependentUpon>
     </Compile>

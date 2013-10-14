@@ -3,13 +3,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:WPFTry"
         xmlns:views="clr-namespace:WPFTry.Views"
-        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" Opacity="0.5" WindowStyle="None" Background="#FFFBFBFB" AllowsTransparency="True"
+        Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" Opacity="0.5" WindowStyle="None" AllowsTransparency="True"
         x:Name="MWin" Topmost="True">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition Height="30"/>
-        </Grid.RowDefinitions>
-        <Button Content="Enter" HorizontalAlignment="Right" Margin="0,0,2,0"  Grid.Row="1" VerticalAlignment="Center" Width="75" Command="{Binding Enter}" CommandParameter="{Binding DataContext, RelativeSource={RelativeSource AncestorType=Window}}"/>
-    </Grid>
+    <Window.Resources>
+        <local:BooleanToColor x:Key="BooleanToColor" />
+    </Window.Resources>
+    <DockPanel Background="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Window}}, Path=IsActive, Converter={StaticResource BooleanToColor}}">
+        <Grid x:Name="MainWindowGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+        </Grid>
+    </DockPanel>
 </Window>

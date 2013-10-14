@@ -20,6 +20,7 @@ namespace WPFTry
     /// </summary>
     public partial class App : System.Windows.Application
     {
+        readonly DispatcherTimer _timer = new DispatcherTimer();
         int selectedScreen = 0;
         IList<MainWindow> _windows = new List<MainWindow>();
 
@@ -30,54 +31,79 @@ namespace WPFTry
             foreach( Screen s in Screen.AllScreens )
                 ConfigureScreen( s );
 
-            StartTimer( delegate( object s, EventArgs args )
-                {
-                    if( selectedScreen > 0 ) _windows[selectedScreen - 1].Background = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 204, 204, 204 ) );
-                    else _windows[_windows.Count - 1].Background = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 204, 204, 204 ) );
-
-                    _windows[selectedScreen].Background = new SolidColorBrush( System.Windows.Media.Color.FromRgb( 255, 153, 0 ) );
-
-                    if( selectedScreen < _windows.Count - 1 ) selectedScreen++;
-                    else selectedScreen = 0;
-                }
-            );
+            _timer.Tick += delegate( object s, EventArgs args )
+            {
+                SwitchWindow();
+            };
+            _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
+            _timer.Start();
         }
 
+        #region Screens configuration
+
+        /// <summary>
+        /// Configure a MainWindow in function of a Screen object
+        /// </summary>
+        /// <param name="screen"></param>
         void ConfigureScreen( Screen screen )
         {
-            MainWindow w = new MainWindow();
+            MainWindow w = new MainWindow( new WindowViewModel() );
             w.Left = screen.WorkingArea.Left;
             w.Top = screen.WorkingArea.Top;
 
             w.Show();
             w.WindowState = WindowState.Maximized;
+            w.KeyUp += EnterKeyUp;
 
             _windows.Add( w );
         }
 
-        void UseScreen( MainWindow w )
+        /// <summary>
+        /// This method switch the current used window
+        /// </summary>
+        void SwitchWindow()
         {
-            GridViewModel grid = new GridViewModel();
+            if( selectedScreen > 0 ) ((WindowViewModel)_windows[selectedScreen - 1].DataContext).IsActive = false;
+            else ((WindowViewModel)_windows[_windows.Count - 1].DataContext).IsActive = false;
 
-            GridZone g = new GridZone( grid.Current );
-            Grid.SetColumn( g, 0 );
-            Grid.SetRow( g, 0 );
-            Grid myGrid = (Grid)w.Content;
-            myGrid.Children.Add( g );
+            ((WindowViewModel)_windows[selectedScreen].DataContext).IsActive = true;
+            _windows[selectedScreen].Focus();
 
-            StartTimer( delegate( object s, EventArgs args )
-                {
-                    grid.SwitchCommand();
-                }
-            );
+            if( selectedScreen < _windows.Count - 1 ) selectedScreen++;
+            else selectedScreen = 0;
         }
 
-        private void StartTimer( EventHandler handler )
+        #endregion
+
+        /// <summary>
+        /// This method will be executed when a keyup event is sent by the window
+        /// </summary>
+        /// <param name="sender">MainWindow</param>
+        /// <param name="args">KeyEventArgs</param>
+        void EnterKeyUp( object sender, System.Windows.Input.KeyEventArgs args )
         {
-            DispatcherTimer timer = new DispatcherTimer();
-            timer.Tick += handler;
-            timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
-            timer.Start();
+            MainWindow w = (MainWindow)sender;
+            if( args.Key == System.Windows.Input.Key.F11 )
+            {
+                WindowViewModel wdc = (WindowViewModel)w.DataContext;
+                if( !wdc.IsEnter )
+                {
+                    _windows.Where( a => a != w ).All( ( a ) =>
+                        {
+                            a.Close();
+                            return true;
+                        }
+                    );
+
+                    Grid myGrid = w.MainWindowGrid;
+                    myGrid.Children.Add( wdc.Enter() );
+                    _timer.Stop();
+                }
+                else
+                {
+                    wdc.Enter();
+                }
+            }
         }
 
         [STAThread]
