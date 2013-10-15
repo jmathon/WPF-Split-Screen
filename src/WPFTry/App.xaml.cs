@@ -52,12 +52,26 @@ namespace WPFTry
         void ConfigureScreen( Screen screen )
         {
             MainWindow w = new MainWindow( new WindowViewModel() );
+            w.Closed += ( o, e ) =>
+            {
+                ((MainWindow)o).IsClosed = true;
+
+                if( _windows.All( x => x.IsClosed ) )
+                {
+                    Dispatcher.Invoke( () =>
+                        {
+                        }
+                    );
+                }
+            };
+
             w.Left = screen.WorkingArea.Left;
             w.Top = screen.WorkingArea.Top;
 
             w.Show();
             w.WindowState = WindowState.Maximized;
             w.KeyUp += EnterKeyUp;
+            w.Closed += WindowClosed;
 
             _windows.Add( w );
         }
@@ -131,6 +145,18 @@ namespace WPFTry
             }
 
             _timer.Start();
+        }
+
+        void WindowClosed( object sender, EventArgs e )
+        {
+            bool canCloseApp = true;
+            foreach( var w in _windows )
+            {
+                if( w.Visibility != Visibility.Hidden && !w.IsClosed )
+                    canCloseApp = false;
+            }
+
+            if( canCloseApp ) System.Windows.Application.Current.Shutdown();
         }
 
         [STAThread]
