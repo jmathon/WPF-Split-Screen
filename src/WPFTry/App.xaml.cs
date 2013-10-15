@@ -22,7 +22,7 @@ namespace WPFTry
     public partial class App : System.Windows.Application
     {
         DispatcherTimer _timer = new DispatcherTimer();
-        int selectedScreen = 0;
+        int selectedScreen = -1;
         IList<MainWindow> _windows = new List<MainWindow>();
 
         public App()
@@ -32,7 +32,6 @@ namespace WPFTry
             foreach( Screen s in Screen.AllScreens )
                 ConfigureScreen( s );
 
-            selectedScreen = 0;
             _timer.Tick += delegate( object s, EventArgs args )
             {
                 SwitchWindow();
@@ -73,14 +72,14 @@ namespace WPFTry
         /// </summary>
         void SwitchWindow()
         {
+            if( selectedScreen < _windows.Count - 1 ) selectedScreen++;
+            else selectedScreen = 0;
+
             if( selectedScreen > 0 ) ((WindowViewModel)_windows[selectedScreen - 1].DataContext).IsActive = false;
             else ((WindowViewModel)_windows[_windows.Count - 1].DataContext).IsActive = false;
 
             ((WindowViewModel)_windows[selectedScreen].DataContext).IsActive = true;
             _windows[selectedScreen].Focus();
-
-            if( selectedScreen < _windows.Count - 1 ) selectedScreen++;
-            else selectedScreen = 0;
         }
 
         #endregion
@@ -95,6 +94,7 @@ namespace WPFTry
             MainWindow w = (MainWindow)sender;
             if( args.Key == System.Windows.Input.Key.F11 )
             {
+                _timer.Stop();
                 WindowViewModel wdc = (WindowViewModel)w.DataContext;
                 if( !wdc.IsEnter )
                 {
@@ -108,7 +108,6 @@ namespace WPFTry
                     Grid myGrid = w.MainWindowGrid;
                     myGrid.Children.Add( wdc.Enter() );
                     wdc.GridOwned.ExitNode += ExitGridNode;
-                    _timer.Stop();
                 }
                 else
                 {
@@ -138,8 +137,8 @@ namespace WPFTry
                     myGrid.Children.Clear();
                 }
             }
-
-            _timer.Start();
+            _windows[selectedScreen].Focus();
+            Dispatcher.Invoke( () => _timer.Start() );
         }
 
         void WindowClosed( object sender, EventArgs e )

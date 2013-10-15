@@ -20,7 +20,7 @@ namespace WPFTry.ViewModels
 
         public int MaxRowProperty { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxRow"] ); } }
 
-        int SwitchLoop { get { return MaxColumnByRowProperty * MaxRowProperty * Int32.Parse( ConfigurationManager.AppSettings["Loop"] ); } }
+        int SwitchLoop { get { return MaxColumnByRowProperty * MaxRowProperty * Int32.Parse( ConfigurationManager.AppSettings["Loop"] ) - 1; } }
 
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
 
