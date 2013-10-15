@@ -55,14 +55,6 @@ namespace WPFTry
             w.Closed += ( o, e ) =>
             {
                 ((MainWindow)o).IsClosed = true;
-
-                if( _windows.All( x => x.IsClosed ) )
-                {
-                    Dispatcher.Invoke( () =>
-                        {
-                        }
-                    );
-                }
             };
 
             w.Left = screen.WorkingArea.Left;
@@ -139,9 +131,12 @@ namespace WPFTry
         {
             foreach( var w in _windows )
             {
-                w.Show();
-                Grid myGrid = w.MainWindowGrid;
-                myGrid.Children.Clear();
+                if( !w.IsClosed )
+                {
+                    w.Show();
+                    Grid myGrid = w.MainWindowGrid;
+                    myGrid.Children.Clear();
+                }
             }
 
             _timer.Start();

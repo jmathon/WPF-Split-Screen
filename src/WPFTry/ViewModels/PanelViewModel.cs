@@ -12,21 +12,27 @@ namespace WPFTry.ViewModels
 {
     public class PanelViewModel : INotifyPropertyChanged
     {
+        int loop = 0;
+        PanelViewModel _parent = null;
+        GridViewModel _grid = null;
+
         public int MaxColumnByRowProperty { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxColumnByRow"] ); } }
 
         public int MaxRowProperty { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxRow"] ); } }
 
+        int SwitchLoop { get { return MaxColumnByRowProperty * MaxRowProperty * Int32.Parse( ConfigurationManager.AppSettings["Loop"] ); } }
+
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
 
-        PanelViewModel _parent = null;
-
-        public PanelViewModel( PanelViewModel parent )
+        public PanelViewModel( GridViewModel owner, PanelViewModel parent )
+            : this( owner )
         {
             _parent = parent;
         }
 
-        public PanelViewModel()
+        public PanelViewModel( GridViewModel owner )
         {
+            _grid = owner;
         }
 
         public void CreatePanels()
@@ -35,7 +41,7 @@ namespace WPFTry.ViewModels
             int nbPanels = MaxColumnByRowProperty * MaxRowProperty;
             for( int i = 0; i < nbPanels; i++ )
             {
-                PanelViewModel p = new PanelViewModel( this );
+                PanelViewModel p = new PanelViewModel( _grid, this );
                 if( i == 0 ) p.IsActive = true;
                 _panels.Add( p );
             }
@@ -81,15 +87,24 @@ namespace WPFTry.ViewModels
 
         public void Switch()
         {
-            var n = Next;
+            if( loop++ < SwitchLoop )
+            {
+                var n = Next;
 
-            Current.IsActive = false;
-            n.IsActive = true;
+                Current.IsActive = false;
+                n.IsActive = true;
+            }
+            else
+            {
+                loop = 0;
+                _grid.ExitCommand();
+            }
         }
 
         public PanelViewModel Enter()
         {
-            var newPanel = new PanelViewModel( this );
+            loop = 0;
+            var newPanel = new PanelViewModel( _grid, this );
             OnEnterNow( new EnterNowEventArgs( newPanel, _panels.IndexOf( Current ) ) );
             return newPanel;
         }
