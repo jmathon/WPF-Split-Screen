@@ -59,27 +59,29 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="BooleanToColor.cs" />
+    <Compile Include="Converters\BooleanToColor.cs" />
     <Compile Include="Events\EnterNowEventArgs.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="Events\ExitGridEventArgs.cs" />
+    <Compile Include="Events\ExitPanelEventArgs.cs" />
+    <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="ViewModels\GridViewModel.cs" />
     <Compile Include="ViewModels\PanelViewModel.cs" />
     <Compile Include="ViewModels\WindowViewModel.cs" />
-    <Compile Include="Views\GridZone.xaml.cs">
+    <Compile Include="Views\Controls\GridZone.xaml.cs">
       <DependentUpon>GridZone.xaml</DependentUpon>
     </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BooleanToVisibilityConverter.cs" />
-    <Page Include="MainWindow.xaml">
+    <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
+    <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\GridZone.xaml">
+    <Page Include="Views\Controls\GridZone.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

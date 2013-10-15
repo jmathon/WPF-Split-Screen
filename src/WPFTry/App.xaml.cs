@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -20,7 +21,7 @@ namespace WPFTry
     /// </summary>
     public partial class App : System.Windows.Application
     {
-        readonly DispatcherTimer _timer = new DispatcherTimer();
+        DispatcherTimer _timer = new DispatcherTimer();
         int selectedScreen = 0;
         IList<MainWindow> _windows = new List<MainWindow>();
 
@@ -31,6 +32,7 @@ namespace WPFTry
             foreach( Screen s in Screen.AllScreens )
                 ConfigureScreen( s );
 
+            selectedScreen = 0;
             _timer.Tick += delegate( object s, EventArgs args )
             {
                 SwitchWindow();
@@ -38,6 +40,8 @@ namespace WPFTry
             _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
             _timer.Start();
         }
+
+        public MainWindow CurrentWindow { get { return _windows[selectedScreen]; } }
 
         #region Screens configuration
 
@@ -90,13 +94,14 @@ namespace WPFTry
                 {
                     _windows.Where( a => a != w ).All( ( a ) =>
                         {
-                            a.Close();
+                            a.Hide();
                             return true;
                         }
                     );
 
                     Grid myGrid = w.MainWindowGrid;
                     myGrid.Children.Add( wdc.Enter() );
+                    wdc.GridOwned.ExitNode += ExitGridNode;
                     _timer.Stop();
                 }
                 else
@@ -104,6 +109,28 @@ namespace WPFTry
                     wdc.Enter();
                 }
             }
+            else if( args.Key == System.Windows.Input.Key.F12 )
+            {
+                WindowViewModel wdc = (WindowViewModel)w.DataContext;
+                wdc.Exit();
+            }
+        }
+
+        /// <summary>
+        /// This method will be executed when a grid exited event is sent by a main grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void ExitGridNode( object sender, Events.ExitGridEventArgs e )
+        {
+            foreach( var w in _windows )
+            {
+                w.Show();
+                Grid myGrid = w.MainWindowGrid;
+                myGrid.Children.Clear();
+            }
+
+            _timer.Start();
         }
 
         [STAThread]

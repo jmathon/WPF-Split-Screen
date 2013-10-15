@@ -31,11 +31,14 @@ namespace WPFTry.Views
             DataContext = panel;
             InitializeComponent();
 
-            panel.EnterNow += OnEnterNow;
+            if( panel != null )
+            {
+                panel.EnterNow += OnEnterNow;
 
-            _panel.CreatePanels();
-            CreateDefinitions();
-            CreatePanels();
+                _panel.CreatePanels();
+                CreateDefinitions();
+                CreatePanels();
+            }
         }
 
         void CreateDefinitions()
@@ -99,10 +102,10 @@ namespace WPFTry.Views
             }
         }
 
-        private void OnExit( int position )
+        private void OnExit( object sender, WPFTry.Events.ExitPanelEventArgs args )
         {
-            DockPanel dp = _dockPanels[position];
-            dp.Children.Clear();
+            foreach( var dp in _dockPanels )
+                dp.Children.Clear();
         }
     }
 }

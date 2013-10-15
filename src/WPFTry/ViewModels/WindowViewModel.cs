@@ -18,11 +18,6 @@ namespace WPFTry.ViewModels
         {
             IsActive = false;
             GridOwned = new GridViewModel();
-            GridOwned.ExitNode += Exit;
-        }
-
-        void Exit( PanelViewModel sender )
-        {
         }
 
         public bool IsActive { get; set; }
@@ -39,13 +34,24 @@ namespace WPFTry.ViewModels
                 Grid.SetColumn( g, 0 );
                 Grid.SetRow( g, 0 );
 
-                GridOwned.SwitchCommand();
+                GridOwned.Switch();
+                GridOwned.ExitNode += ExitGridNode;
 
                 _isEnter = true;
                 return g;
             }
-            GridOwned.EnterCommand();
+            GridOwned.Enter();
             return null;
+        }
+
+        public void Exit()
+        {
+            GridOwned.ExitCommand();
+        }
+
+        void ExitGridNode( object sender, Events.ExitGridEventArgs e )
+        {
+            _isEnter = false;
         }
     }
 }
