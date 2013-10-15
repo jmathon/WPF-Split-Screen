@@ -18,12 +18,24 @@ namespace WPFTry.ViewModels
 
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
 
+        PanelViewModel _parent = null;
+
+        public PanelViewModel( PanelViewModel parent )
+        {
+            _parent = parent;
+        }
+
+        public PanelViewModel()
+        {
+        }
+
         public void CreatePanels()
         {
+            _panels.Clear();
             int nbPanels = MaxColumnByRowProperty * MaxRowProperty;
             for( int i = 0; i < nbPanels; i++ )
             {
-                PanelViewModel p = new PanelViewModel();
+                PanelViewModel p = new PanelViewModel( this );
                 if( i == 0 ) p.IsActive = true;
                 _panels.Add( p );
             }
@@ -51,13 +63,9 @@ namespace WPFTry.ViewModels
 
         #endregion
 
-        public PanelViewModel Current
-        {
-            get
-            {
-                return _panels.Where( a => a.IsActive ).SingleOrDefault() ?? _panels[0];
-            }
-        }
+        public PanelViewModel Parent { get { return _parent; } }
+
+        public PanelViewModel Current { get { return _panels.Where( a => a.IsActive ).SingleOrDefault() ?? _panels[0]; } }
 
         public PanelViewModel Next
         {
@@ -69,13 +77,7 @@ namespace WPFTry.ViewModels
             }
         }
 
-        public IList<PanelViewModel> Panels
-        {
-            get
-            {
-                return _panels;
-            }
-        }
+        public IList<PanelViewModel> Panels { get { return _panels; } }
 
         public void Switch()
         {
@@ -87,7 +89,7 @@ namespace WPFTry.ViewModels
 
         public PanelViewModel Enter()
         {
-            var newPanel = new PanelViewModel();
+            var newPanel = new PanelViewModel( this );
             OnEnterNow( new EnterNowEventArgs( newPanel, _panels.IndexOf( Current ) ) );
             return newPanel;
         }
@@ -107,13 +109,12 @@ namespace WPFTry.ViewModels
             }
         }
 
-        public delegate void ExitHandler( int position );
+        public event EventHandler<ExitPanelEventArgs> ExitNode;
 
-        public event ExitHandler ExitNode;
-
-        public void Exit( int position )
+        public void Exit()
         {
-            ExitNode( position );
+            if( ExitNode != null )
+                ExitNode( this, new ExitPanelEventArgs { Position = 0 } );
         }
     }
 }

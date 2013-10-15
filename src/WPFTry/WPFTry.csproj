@@ -61,6 +61,8 @@
     </Page>
     <Compile Include="BooleanToColor.cs" />
     <Compile Include="Events\EnterNowEventArgs.cs" />
+    <Compile Include="Events\ExitGridEventArgs.cs" />
+    <Compile Include="Events\ExitPanelEventArgs.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
+using WPFTry.Events;
 
 namespace WPFTry.ViewModels
 {
@@ -20,7 +21,7 @@ namespace WPFTry.ViewModels
         {
             get
             {
-                return _panels.Peek();
+                return _panels.Count != 0 ? _panels.Peek() : null;
             }
         }
 
@@ -30,18 +31,21 @@ namespace WPFTry.ViewModels
         {
             var m = new PanelViewModel();
             _panels.Push( m );
+
+            _timer.Tick += delegate( object s, EventArgs args )
+            {
+                if( Current != null )
+                    Current.Switch();
+                else
+                    _timer.Stop();
+            };
+            _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
         }
 
         public void SwitchCommand()
         {
             Debug.Assert( Current != null );
-            _timer.Tick += delegate( object s, EventArgs args )
-            {
-                Current.Switch();
-            };
-            _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
             _timer.Start();
-
         }
 
         public void EnterCommand()
@@ -63,16 +67,20 @@ namespace WPFTry.ViewModels
             }
         }
 
-        public delegate void ExitNodeHandler( PanelViewModel p );
-        public event ExitNodeHandler ExitNode;
+        public event EventHandler<ExitGridEventArgs> ExitNode;
 
         public void ExitCommand()
         {
-            Debug.Assert( Current != null );
-            Debug.Assert( _panels.Count > 0 );
-
-            var panelToRemove = _panels.Pop();
-            panelToRemove.Exit( _panels.Count );
+            if( _panels.Count <= 1 )
+            {
+                if( ExitNode != null ) ExitNode( this, new ExitGridEventArgs() );
+            }
+            else
+            {
+                var panelToRemove = _panels.Pop();
+                if( panelToRemove != null ) panelToRemove.Exit();
+                _timer.Start();
+            }
         }
     }
 }
