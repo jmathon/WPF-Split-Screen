@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using WPFTry.ViewModels;
+using WPFTry.Views;
 
 namespace WPFTry
 {
@@ -20,9 +22,10 @@ namespace WPFTry
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        public MainWindow( WindowViewModel w )
         {
             InitializeComponent();
+            DataContext = w;
         }
     }
 }
