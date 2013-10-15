@@ -35,7 +35,7 @@ namespace WPFTry.ViewModels
 
         public GridViewModel()
         {
-            var m = new PanelViewModel();
+            var m = new PanelViewModel( this );
             _panels.Push( m );
 
             _timer.Tick += delegate( object s, EventArgs args )
@@ -87,6 +87,7 @@ namespace WPFTry.ViewModels
         {
             if( _panels.Count <= 1 )
             {
+                _timer.Stop();
                 if( ExitNode != null ) ExitNode( this, new ExitGridEventArgs() );
             }
             else
