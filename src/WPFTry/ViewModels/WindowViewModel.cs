@@ -34,24 +34,24 @@ namespace WPFTry.ViewModels
                 Grid.SetColumn( g, 0 );
                 Grid.SetRow( g, 0 );
 
-                GridOwned.SwitchCommand();
+                GridOwned.Switch();
                 GridOwned.ExitNode += ExitGridNode;
 
                 _isEnter = true;
                 return g;
             }
-            GridOwned.EnterCommand();
+            GridOwned.Enter();
             return null;
-        }
-
-        void ExitGridNode( object sender, Events.ExitGridEventArgs e )
-        {
-            _isEnter = false;
         }
 
         public void Exit()
         {
             GridOwned.ExitCommand();
+        }
+
+        void ExitGridNode( object sender, Events.ExitGridEventArgs e )
+        {
+            _isEnter = false;
         }
     }
 }

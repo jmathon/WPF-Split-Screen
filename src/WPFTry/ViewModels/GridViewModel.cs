@@ -14,9 +14,12 @@ namespace WPFTry.ViewModels
 {
     public class GridViewModel
     {
-        readonly DispatcherTimer _timer = new DispatcherTimer();
+        DispatcherTimer _timer = new DispatcherTimer();
         Stack<PanelViewModel> _panels = new Stack<PanelViewModel>();
 
+        /// <summary>
+        /// This property getting the current panel that is highlighted
+        /// </summary>
         public PanelViewModel Current
         {
             get
@@ -25,6 +28,9 @@ namespace WPFTry.ViewModels
             }
         }
 
+        /// <summary>
+        /// This property getting the max deep
+        /// </summary>
         public int MaxDeep { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxDeep"] ); } }
 
         public GridViewModel()
@@ -42,13 +48,19 @@ namespace WPFTry.ViewModels
             _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
         }
 
-        public void SwitchCommand()
+        /// <summary>
+        /// This method drives all panel switching
+        /// </summary>
+        public void Switch()
         {
             Debug.Assert( Current != null );
             _timer.Start();
         }
 
-        public void EnterCommand()
+        /// <summary>
+        /// This method drives all panel entering
+        /// </summary>
+        public void Enter()
         {
             Debug.Assert( Current != null );
             Debug.Assert( _panels.Count > 0 );
@@ -67,6 +79,8 @@ namespace WPFTry.ViewModels
             }
         }
 
+        #region Events
+
         public event EventHandler<ExitGridEventArgs> ExitNode;
 
         public void ExitCommand()
@@ -82,5 +96,7 @@ namespace WPFTry.ViewModels
                 _timer.Start();
             }
         }
+
+        #endregion
     }
 }

@@ -32,15 +32,6 @@ namespace WPFTry
             foreach( Screen s in Screen.AllScreens )
                 ConfigureScreen( s );
 
-            StartScreenScrolling();
-        }
-
-        public MainWindow CurrentWindow { get { return _windows[selectedScreen]; } }
-
-        #region Screens configuration
-
-        void StartScreenScrolling()
-        {
             selectedScreen = 0;
             _timer.Tick += delegate( object s, EventArgs args )
             {
@@ -49,6 +40,10 @@ namespace WPFTry
             _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
             _timer.Start();
         }
+
+        public MainWindow CurrentWindow { get { return _windows[selectedScreen]; } }
+
+        #region Screens configuration
 
         /// <summary>
         /// Configure a MainWindow in function of a Screen object
@@ -121,6 +116,11 @@ namespace WPFTry
             }
         }
 
+        /// <summary>
+        /// This method will be executed when a grid exited event is sent by a main grid
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void ExitGridNode( object sender, Events.ExitGridEventArgs e )
         {
             foreach( var w in _windows )
