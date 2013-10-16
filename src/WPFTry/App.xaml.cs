@@ -34,7 +34,7 @@ namespace WPFTry
         {
             InitializeComponent();
 
-            foreach( Screen s in Screen.AllScreens )
+            foreach( Screen s in Screen.AllScreens.Reverse() )
                 ConfigureScreen( s );
 
             if( _windows.Count == 1 )
