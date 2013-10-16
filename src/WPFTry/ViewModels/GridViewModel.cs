@@ -63,7 +63,7 @@ namespace WPFTry.ViewModels
         /// </summary>
         public void RestartSwitch()
         {
-            if( !_timer.IsEnabled && _loop++ < 3 )
+            if( !_timer.IsEnabled && _loop++ < Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ?? "0" ) )
                 _timer.Start();
         }
 
