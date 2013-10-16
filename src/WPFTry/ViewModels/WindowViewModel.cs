@@ -12,6 +12,7 @@ namespace WPFTry.ViewModels
 {
     public class WindowViewModel
     {
+        bool _isOnlyOne = false;
         bool _isEnter = false;
 
         public WindowViewModel()
@@ -24,12 +25,15 @@ namespace WPFTry.ViewModels
 
         public bool IsEnter { get { return _isEnter; } }
 
+        public bool IsOnlyOne { get { return _isOnlyOne; } }
+
         public GridViewModel GridOwned { get; set; }
 
-        public GridZone Enter()
+        public GridZone Enter( bool isOnlyOne = false )
         {
             if( !_isEnter )
             {
+                _isOnlyOne = isOnlyOne;
                 GridZone g = new GridZone( GridOwned.Current );
                 Grid.SetColumn( g, 0 );
                 Grid.SetRow( g, 0 );
@@ -51,7 +55,8 @@ namespace WPFTry.ViewModels
 
         void ExitGridNode( object sender, Events.ExitGridEventArgs e )
         {
-            _isEnter = false;
+            if( !IsOnlyOne )
+                _isEnter = false;
         }
     }
 }

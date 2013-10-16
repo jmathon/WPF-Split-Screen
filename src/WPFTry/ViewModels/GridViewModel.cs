@@ -58,6 +58,15 @@ namespace WPFTry.ViewModels
         }
 
         /// <summary>
+        /// Manually restart switching
+        /// </summary>
+        public void RestartSwitch()
+        {
+            if( !_timer.IsEnabled )
+                _timer.Start();
+        }
+
+        /// <summary>
         /// This method drives all panel entering
         /// </summary>
         public void Enter()
