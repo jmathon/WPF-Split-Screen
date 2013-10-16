@@ -101,7 +101,9 @@ namespace WPFTry
             {
                 _loop = 0;
                 _timer.Stop();
-                ((WindowViewModel)_windows[selectedScreen].DataContext).Pause();
+
+                foreach( var w in _windows )
+                    ((WindowViewModel)w.DataContext).Pause();
             }
         }
 
@@ -135,7 +137,8 @@ namespace WPFTry
                     }
                     else
                     {
-                        ((WindowViewModel)_windows[selectedScreen].DataContext).Pause();
+                        foreach( var win in _windows )
+                            ((WindowViewModel)win.DataContext).Pause();
                         _timer.Start();
                     }
                 }
