@@ -29,6 +29,9 @@ namespace WPFTry.ViewModels
             }
         }
 
+
+        public IReadOnlyList<PanelViewModel> Panels { get { return _panels.ToList().AsReadOnly(); } }
+
         /// <summary>
         /// This property getting the max deep
         /// </summary>

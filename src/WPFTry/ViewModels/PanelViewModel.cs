@@ -87,16 +87,23 @@ namespace WPFTry.ViewModels
 
         public void Switch()
         {
+            var n = Next;
+
             if( loop++ < SwitchLoop )
             {
-                var n = Next;
-
                 Current.IsActive = false;
                 n.IsActive = true;
             }
             else
             {
                 loop = 0;
+
+                if( _grid.Panels.Count() <= 1 )
+                {
+                    Current.IsActive = false;
+                    n.IsActive = true;
+                }
+
                 _grid.ExitCommand();
             }
         }
