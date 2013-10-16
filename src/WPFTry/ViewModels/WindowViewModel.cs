@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Configuration;
 using System.Linq;
 using System.Text;
@@ -10,22 +11,31 @@ using WPFTry.Views;
 
 namespace WPFTry.ViewModels
 {
-    public class WindowViewModel
+    public class WindowViewModel : INotifyPropertyChanged
     {
         bool _isOnlyOne = false;
         bool _isEnter = false;
+        bool _isPause = false;
 
         public WindowViewModel()
         {
             IsActive = false;
-            GridOwned = new GridViewModel();
+            GridOwned = new GridViewModel( this );
         }
+
+        public bool IsPause { get { return _isPause; } }
 
         public bool IsActive { get; set; }
 
         public bool IsEnter { get { return _isEnter; } }
 
         public bool IsOnlyOne { get { return _isOnlyOne; } }
+
+        internal void Pause()
+        {
+            _isPause = !_isPause;
+            OnPropertyChanged( "IsPause" );
+        }
 
         public GridViewModel GridOwned { get; set; }
 
@@ -58,5 +68,20 @@ namespace WPFTry.ViewModels
             if( !IsOnlyOne )
                 _isEnter = false;
         }
+
+        #region INotifyPropertyChanged Members
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged( string name )
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if( handler != null )
+            {
+                handler( this, new PropertyChangedEventArgs( name ) );
+            }
+        }
+
+        #endregion
     }
 }

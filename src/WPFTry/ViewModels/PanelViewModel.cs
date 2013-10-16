@@ -58,7 +58,7 @@ namespace WPFTry.ViewModels
 
         public virtual event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged( string name )
+        protected void OnPropertyChanged( string name )
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if( handler != null )
@@ -87,16 +87,22 @@ namespace WPFTry.ViewModels
 
         public void Switch()
         {
+            var n = Next;
+
             if( loop++ < SwitchLoop )
             {
-                var n = Next;
-
                 Current.IsActive = false;
                 n.IsActive = true;
             }
             else
             {
                 loop = 0;
+
+                if( _grid.Panels.Count() <= 1 )
+                {
+                    Current.IsActive = false;
+                    n.IsActive = true;
+                }
                 _grid.ExitCommand();
             }
         }
