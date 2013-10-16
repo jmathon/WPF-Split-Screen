@@ -21,7 +21,7 @@ namespace WPFTry
             {
                 val = !val;
             }
-            if( val )
+            if( !val )
             {
                 return Visibility.Visible;
             }

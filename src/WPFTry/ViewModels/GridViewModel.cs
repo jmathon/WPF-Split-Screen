@@ -14,8 +14,10 @@ namespace WPFTry.ViewModels
 {
     public class GridViewModel
     {
+        readonly WindowViewModel _window;
         DispatcherTimer _timer = new DispatcherTimer();
         Stack<PanelViewModel> _panels = new Stack<PanelViewModel>();
+
         int _loop = 0;
 
         /// <summary>
@@ -29,16 +31,19 @@ namespace WPFTry.ViewModels
             }
         }
 
-
-        public IReadOnlyList<PanelViewModel> Panels { get { return _panels.ToList().AsReadOnly(); } }
+        /// <summary>
+        /// This property expose a ReadOnlyList of the internal panels stacks
+        /// </summary>
+        public ICollection<PanelViewModel> Panels { get { return _panels.ToList().AsReadOnly(); } }
 
         /// <summary>
         /// This property getting the max deep
         /// </summary>
         public int MaxDeep { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxDeep"] ); } }
 
-        public GridViewModel()
+        public GridViewModel( WindowViewModel window )
         {
+            _window = window;
             var m = new PanelViewModel( this );
             _panels.Push( m );
 
@@ -50,6 +55,11 @@ namespace WPFTry.ViewModels
                     _timer.Stop();
             };
             _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
+        }
+
+        internal void PauseWindowOwner()
+        {
+            _window.Pause();
         }
 
         /// <summary>
@@ -96,6 +106,7 @@ namespace WPFTry.ViewModels
             else
             {
                 _loop = 0;
+                PauseWindowOwner();
                 _timer.Start();
             }
         }
@@ -109,6 +120,7 @@ namespace WPFTry.ViewModels
             if( _panels.Count <= 1 )
             {
                 _timer.Stop();
+                if( _loop >= Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ?? "0" ) ) PauseWindowOwner();
                 if( ExitNode != null ) ExitNode( this, new ExitGridEventArgs() );
             }
             else

@@ -23,10 +23,9 @@ namespace WPFTry
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow( WindowViewModel w )
+        public MainWindow()
         {
             InitializeComponent();
-            DataContext = w;
         }
 
         public bool IsClosed { get; set; }

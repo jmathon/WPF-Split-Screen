@@ -64,7 +64,7 @@ namespace WPFTry
         /// <param name="screen"></param>
         void ConfigureScreen( Screen screen )
         {
-            MainWindow w = new MainWindow( new WindowViewModel() );
+            MainWindow w = new MainWindow();
             w.Closed += ( o, e ) =>
             {
                 ((MainWindow)o).IsClosed = true;
@@ -101,6 +101,7 @@ namespace WPFTry
             {
                 _loop = 0;
                 _timer.Stop();
+                ((WindowViewModel)_windows[selectedScreen].DataContext).Pause();
             }
         }
 
@@ -134,6 +135,7 @@ namespace WPFTry
                     }
                     else
                     {
+                        ((WindowViewModel)_windows[selectedScreen].DataContext).Pause();
                         _timer.Start();
                     }
                 }
@@ -176,7 +178,7 @@ namespace WPFTry
                     }
                 }
                 _windows[selectedScreen].Focus();
-                Dispatcher.Invoke( () => _timer.Start() );
+                Dispatcher.Invoke( new Action( () => _timer.Start() ) );
             }
             else
             {

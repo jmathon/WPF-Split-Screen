@@ -58,7 +58,7 @@ namespace WPFTry.ViewModels
 
         public virtual event PropertyChangedEventHandler PropertyChanged;
 
-        protected virtual void OnPropertyChanged( string name )
+        protected void OnPropertyChanged( string name )
         {
             PropertyChangedEventHandler handler = PropertyChanged;
             if( handler != null )
@@ -103,7 +103,6 @@ namespace WPFTry.ViewModels
                     Current.IsActive = false;
                     n.IsActive = true;
                 }
-
                 _grid.ExitCommand();
             }
         }
