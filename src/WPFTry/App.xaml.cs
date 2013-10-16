@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
@@ -23,21 +24,34 @@ namespace WPFTry
     {
         DispatcherTimer _timer = new DispatcherTimer();
         int selectedScreen = -1;
+        int _loop = 0;
+
+        public int MaxLoop { get { return _windows.Count * Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ); } }
+
         IList<MainWindow> _windows = new List<MainWindow>();
 
         public App()
         {
             InitializeComponent();
 
-            foreach( Screen s in Screen.AllScreens )
+            foreach( Screen s in Screen.AllScreens.Reverse() )
                 ConfigureScreen( s );
 
-            _timer.Tick += delegate( object s, EventArgs args )
+            if( _windows.Count == 1 )
             {
-                SwitchWindow();
-            };
-            _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
-            _timer.Start();
+                MainWindow w = _windows[0];
+                WindowViewModel wdc = (WindowViewModel)w.DataContext;
+                CreateFirstGrid( w, wdc, true );
+            }
+            else
+            {
+                _timer.Tick += delegate( object s, EventArgs args )
+                {
+                    SwitchWindow();
+                };
+                _timer.Interval = new TimeSpan( 0, 0, 0, 0, Int32.Parse( ConfigurationManager.AppSettings["TimeToSwitch"] ) );
+                _timer.Start();
+            }
         }
 
         public MainWindow CurrentWindow { get { return _windows[selectedScreen]; } }
@@ -72,14 +86,22 @@ namespace WPFTry
         /// </summary>
         void SwitchWindow()
         {
-            if( selectedScreen < _windows.Count - 1 ) selectedScreen++;
-            else selectedScreen = 0;
+            if( _loop++ < MaxLoop )
+            {
+                if( selectedScreen < _windows.Count - 1 ) selectedScreen++;
+                else selectedScreen = 0;
 
-            if( selectedScreen > 0 ) ((WindowViewModel)_windows[selectedScreen - 1].DataContext).IsActive = false;
-            else ((WindowViewModel)_windows[_windows.Count - 1].DataContext).IsActive = false;
+                if( selectedScreen > 0 ) ((WindowViewModel)_windows[selectedScreen - 1].DataContext).IsActive = false;
+                else ((WindowViewModel)_windows[_windows.Count - 1].DataContext).IsActive = false;
 
-            ((WindowViewModel)_windows[selectedScreen].DataContext).IsActive = true;
-            _windows[selectedScreen].Focus();
+                ((WindowViewModel)_windows[selectedScreen].DataContext).IsActive = true;
+                _windows[selectedScreen].Focus();
+            }
+            else
+            {
+                _loop = 0;
+                _timer.Stop();
+            }
         }
 
         #endregion
@@ -94,23 +116,30 @@ namespace WPFTry
             MainWindow w = (MainWindow)sender;
             if( args.Key == System.Windows.Input.Key.F11 )
             {
-                _timer.Stop();
                 WindowViewModel wdc = (WindowViewModel)w.DataContext;
                 if( !wdc.IsEnter )
                 {
-                    _windows.Where( a => a != w ).All( ( a ) =>
-                        {
-                            a.Hide();
-                            return true;
-                        }
-                    );
+                    if( _timer.IsEnabled )
+                    {
+                        _timer.Stop();
+                        _windows.Where( a => a != w ).All( ( a ) =>
+                            {
+                                a.Hide();
+                                return true;
+                            }
+                        );
 
-                    Grid myGrid = w.MainWindowGrid;
-                    myGrid.Children.Add( wdc.Enter() );
-                    wdc.GridOwned.ExitNode += ExitGridNode;
+                        CreateFirstGrid( w, wdc );
+                        _loop = 0;
+                    }
+                    else
+                    {
+                        _timer.Start();
+                    }
                 }
                 else
                 {
+                    _timer.Stop();
                     wdc.Enter();
                 }
             }
@@ -121,6 +150,13 @@ namespace WPFTry
             }
         }
 
+        private void CreateFirstGrid( MainWindow w, WindowViewModel wdc, bool onlyOneMode = false )
+        {
+            Grid myGrid = w.MainWindowGrid;
+            myGrid.Children.Add( wdc.Enter( onlyOneMode ) );
+            wdc.GridOwned.ExitNode += ExitGridNode;
+        }
+
         /// <summary>
         /// This method will be executed when a grid exited event is sent by a main grid
         /// </summary>
@@ -128,17 +164,26 @@ namespace WPFTry
         /// <param name="e"></param>
         void ExitGridNode( object sender, Events.ExitGridEventArgs e )
         {
-            foreach( var w in _windows )
+            if( _windows.Count > 1 )
             {
-                if( !w.IsClosed )
+                foreach( var w in _windows )
                 {
-                    w.Show();
-                    Grid myGrid = w.MainWindowGrid;
-                    myGrid.Children.Clear();
+                    if( !w.IsClosed )
+                    {
+                        w.Show();
+                        Grid myGrid = w.MainWindowGrid;
+                        myGrid.Children.Clear();
+                    }
                 }
+                _windows[selectedScreen].Focus();
+                Dispatcher.Invoke( () => _timer.Start() );
             }
-            _windows[selectedScreen].Focus();
-            Dispatcher.Invoke( () => _timer.Start() );
+            else
+            {
+                Debug.Assert( _windows.Count > 0 );
+                WindowViewModel wdc = (WindowViewModel)_windows[0].DataContext;
+                wdc.GridOwned.RestartSwitch();
+            }
         }
 
         void WindowClosed( object sender, EventArgs e )
