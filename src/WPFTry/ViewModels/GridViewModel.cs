@@ -16,6 +16,7 @@ namespace WPFTry.ViewModels
     {
         DispatcherTimer _timer = new DispatcherTimer();
         Stack<PanelViewModel> _panels = new Stack<PanelViewModel>();
+        int _loop = 0;
 
         /// <summary>
         /// This property getting the current panel that is highlighted
@@ -58,6 +59,15 @@ namespace WPFTry.ViewModels
         }
 
         /// <summary>
+        /// Manually restart switching
+        /// </summary>
+        public void RestartSwitch()
+        {
+            if( !_timer.IsEnabled && _loop++ < Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ?? "0" ) )
+                _timer.Start();
+        }
+
+        /// <summary>
         /// This method drives all panel entering
         /// </summary>
         public void Enter()
@@ -65,17 +75,25 @@ namespace WPFTry.ViewModels
             Debug.Assert( Current != null );
             Debug.Assert( _panels.Count > 0 );
 
-            if( (_panels.Count - 1) < MaxDeep )
+            if( _timer.IsEnabled )
             {
-                _timer.Stop();
-                var newPanel = Current.Enter();
-                _panels.Push( newPanel );
-                _timer.Start();
+                if( (_panels.Count - 1) < MaxDeep )
+                {
+                    _timer.Stop();
+                    var newPanel = Current.Enter();
+                    _panels.Push( newPanel );
+                    _timer.Start();
+                }
+                else
+                {
+                    _timer.Stop();
+                    MessageBox.Show( "You have reached the max deep !", "Warning...", MessageBoxButton.OK, MessageBoxImage.Exclamation );
+                }
             }
             else
             {
-                _timer.Stop();
-                MessageBox.Show( "You have reached the max deep !", "Warning...", MessageBoxButton.OK, MessageBoxImage.Exclamation );
+                _loop = 0;
+                _timer.Start();
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -17,6 +18,7 @@ namespace WPFTry
         public bool UseHidden { get; set; }
         public object Convert( object value, Type targetType, object parameter, CultureInfo culture )
         {
+            string color = ConfigurationManager.AppSettings["Background"] ?? "#FF9900";
             var val = System.Convert.ToBoolean( value, CultureInfo.InvariantCulture );
             if( this.IsReversed )
             {
@@ -24,10 +26,17 @@ namespace WPFTry
             }
             if( val )
             {
-                return new SolidColorBrush( Color.FromRgb( 255, 153, 0 ) );
+                return BrushConverterString( color );
             }
             return new SolidColorBrush( Color.FromRgb( 204, 204, 204 ) );
         }
+
+        SolidColorBrush BrushConverterString( string color )
+        {
+            var b = new BrushConverter();
+            return (SolidColorBrush)b.ConvertFrom( color );
+        }
+
         public object ConvertBack( object value, Type targetType, object parameter, CultureInfo culture )
         {
             throw new NotSupportedException();
