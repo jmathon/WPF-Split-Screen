@@ -76,8 +76,7 @@ namespace WPFTry.ViewModels
         /// </summary>
         public void RestartSwitch()
         {
-            if( !_timer.IsEnabled && _loop++ < Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ?? "0" ) )
-                _timer.Start();
+            _loop++;
         }
 
         /// <summary>
@@ -105,7 +104,6 @@ namespace WPFTry.ViewModels
             }
             else
             {
-                _loop = 0;
                 PauseWindowOwner();
                 _timer.Start();
             }
@@ -120,8 +118,12 @@ namespace WPFTry.ViewModels
             _timer.Stop();
             if( _panels.Count <= 1 )
             {
-                if( _loop >= Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ?? "0" ) ) PauseWindowOwner();
-                if( ExitNode != null ) ExitNode( this, new ExitGridEventArgs() );
+                if( !_window.IsPause && (_loop >= Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ?? "0" ) || _window.IsOnlyOne) )
+                {
+                    _loop = 0;
+                    PauseWindowOwner();
+                }
+                if( ExitNode != null && !_window.IsPause ) ExitNode( this, new ExitGridEventArgs() );
             }
             else
             {
