@@ -5,7 +5,7 @@
         xmlns:views="clr-namespace:WPFTry.Views"
         xmlns:viewModels="clr-namespace:WPFTry.ViewModels"
         Title="MainWindow" Height="350" Width="525" ResizeMode="NoResize" WindowStyle="None" AllowsTransparency="True"
-        x:Name="MWin" Topmost="False">
+        x:Name="MWin" Topmost="True">
     <Window.Resources>
         <local:BooleanToColor x:Key="BooleanToColor" />
         <local:BooleanToOpacity x:Key="BooleanToOpacity" />
