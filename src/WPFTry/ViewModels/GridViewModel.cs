@@ -117,9 +117,9 @@ namespace WPFTry.ViewModels
 
         public void ExitCommand()
         {
+            _timer.Stop();
             if( _panels.Count <= 1 )
             {
-                _timer.Stop();
                 if( _loop >= Int32.Parse( ConfigurationManager.AppSettings["ScrollingBeforeStop"] ?? "0" ) ) PauseWindowOwner();
                 if( ExitNode != null ) ExitNode( this, new ExitGridEventArgs() );
             }
