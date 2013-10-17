@@ -102,9 +102,16 @@ namespace WPFTry
                 _loop = 0;
                 _timer.Stop();
 
-                foreach( var w in _windows )
-                    ((WindowViewModel)w.DataContext).Pause();
+                PauseAllWindows();
             }
+        }
+
+        public bool ArePaused { get { return _windows.All( a => ((WindowViewModel)a.DataContext).IsPause ); } }
+
+        private void PauseAllWindows()
+        {
+            foreach( var w in _windows )
+                ((WindowViewModel)w.DataContext).Pause();
         }
 
         #endregion
@@ -137,8 +144,7 @@ namespace WPFTry
                     }
                     else
                     {
-                        foreach( var win in _windows )
-                            ((WindowViewModel)win.DataContext).Pause();
+                        PauseAllWindows();
                         _timer.Start();
                     }
                 }
@@ -151,7 +157,19 @@ namespace WPFTry
             else if( args.Key == System.Windows.Input.Key.F12 )
             {
                 WindowViewModel wdc = (WindowViewModel)w.DataContext;
-                wdc.Exit();
+                if( wdc.IsEnter )
+                {
+                    wdc.Exit();
+                }
+                else
+                {
+                    if( !ArePaused )
+                    {
+                        _loop = 0;
+                        _timer.Stop();
+                        PauseAllWindows();
+                    }
+                }
             }
         }
 

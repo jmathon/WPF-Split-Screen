@@ -12,7 +12,8 @@ namespace WPFTry.ViewModels
 {
     public class PanelViewModel : INotifyPropertyChanged
     {
-        int loop = 0;
+        int _loop = 0;
+        int _position = 0;
         PanelViewModel _parent = null;
         GridViewModel _grid = null;
 
@@ -20,14 +21,22 @@ namespace WPFTry.ViewModels
 
         public int MaxRowProperty { get { return Int32.Parse( ConfigurationManager.AppSettings["MaxRow"] ); } }
 
-        int SwitchLoop { get { return MaxColumnByRowProperty * MaxRowProperty * Int32.Parse( ConfigurationManager.AppSettings["Loop"] ) - 1; } }
+        int SwitchLoop
+        {
+            get
+            {
+                int d = MaxColumnByRowProperty * MaxRowProperty * Int32.Parse( ConfigurationManager.AppSettings["Loop"] ) - 1;
+                return d;
+            }
+        }
 
         IList<PanelViewModel> _panels = new List<PanelViewModel>();
 
-        public PanelViewModel( GridViewModel owner, PanelViewModel parent )
+        public PanelViewModel( GridViewModel owner, int position, PanelViewModel parent )
             : this( owner )
         {
             _parent = parent;
+            if( position > 0 ) _position = position;
         }
 
         public PanelViewModel( GridViewModel owner )
@@ -41,7 +50,7 @@ namespace WPFTry.ViewModels
             int nbPanels = MaxColumnByRowProperty * MaxRowProperty;
             for( int i = 0; i < nbPanels; i++ )
             {
-                PanelViewModel p = new PanelViewModel( _grid, this );
+                PanelViewModel p = new PanelViewModel( _grid, _panels.Count - 1, this );
                 if( i == 0 ) p.IsActive = true;
                 _panels.Add( p );
             }
@@ -89,14 +98,15 @@ namespace WPFTry.ViewModels
         {
             var n = Next;
 
-            if( loop++ < SwitchLoop )
+            if( _loop++ < SwitchLoop )
             {
                 Current.IsActive = false;
                 n.IsActive = true;
             }
             else
             {
-                loop = 0;
+                _loop = 0;
+                if( Parent != null ) Parent.SetLoop( 0 - ((MaxColumnByRowProperty + MaxRowProperty) - _position ));
 
                 if( _grid.Panels.Count() <= 1 )
                 {
@@ -107,10 +117,15 @@ namespace WPFTry.ViewModels
             }
         }
 
+        void SetLoop( int loop )
+        {
+            _loop = loop;
+        }
+
         public PanelViewModel Enter()
         {
-            loop = 0;
-            var newPanel = new PanelViewModel( _grid, this );
+            _loop = 0;
+            var newPanel = new PanelViewModel( _grid, _panels.IndexOf( Current ), this );
             OnEnterNow( new EnterNowEventArgs( newPanel, _panels.IndexOf( Current ) ) );
             return newPanel;
         }
